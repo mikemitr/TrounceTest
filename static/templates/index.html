@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block ext_js %}
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+    <script src="{% static 'main.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    <h1>Trounceflow Test Task</h1>
+    <div id="line-chart" class="chart" ></div>
+    <button id="rescale">Re-scale</button>
+
+    <div id="bar-chart" class="chart"></div>
+{% endblock %}
