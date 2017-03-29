@@ -61,7 +61,7 @@ var ChartsController = {
     loadData: function(series) {
         var _this = this;
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', _this.apiURL + 'api/series/?series='+series, false);
+        xhr.open('GET', _this.apiURL + 'api/series/?series='+series);
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4 && xhr.status == 200) {
                 var data = JSON.parse(xhr.responseText);
@@ -74,7 +74,7 @@ var ChartsController = {
     monthlyReturn: function(series) {
         var _this = this;
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', _this.apiURL + 'api/series/monthly_return/?series='+series, false);
+        xhr.open('GET', _this.apiURL + 'api/series/monthly_return/?series='+series);
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4 && xhr.status == 200) {
                 var data = JSON.parse(xhr.responseText);
@@ -112,7 +112,9 @@ document.addEventListener('DOMContentLoaded', function() {
     ChartsController.monthlyReturn('Aberdeen Global - Emerging Markets Local Currency Bond Fund');
     ChartsController.monthlyReturn('Ashmore SICAV - Emerging Markets Local Currency Bond Fund');
 
-    document.getElementById('rescale').addEventListener('click', function() {
+    var rescaleButton = document.getElementById('rescale');
+    rescaleButton.addEventListener('click', function() {
        ChartsController.rescale(Date.UTC(2012, 0, 0), 100);
+       rescaleButton.style.display = 'none';
     });
 });
