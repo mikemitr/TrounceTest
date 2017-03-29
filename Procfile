@@ -1,0 +1,1 @@
+web: gunicorn trouncetest.wsgi --log-file -

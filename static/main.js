@@ -1,6 +1,6 @@
 var ChartsController = {
 
-    apiURL: 'http://localhost:8000/',
+    apiURL: 'https://trouncetest.herokuapp.com/',
     monthMilliseconds: 3600 * 24 * 30 * 1000,
 
     init: function() {

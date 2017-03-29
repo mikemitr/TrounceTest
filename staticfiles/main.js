@@ -1,13 +1,16 @@
 var ChartsController = {
 
-    apiURL: 'http://localhost:8000/',
+    apiURL: 'https://trouncetest.herokuapp.com/',
+    monthMilliseconds: 3600 * 24 * 30 * 1000,
 
     init: function() {
         this.lineChart = Highcharts.chart('line-chart', {
             chart: {
-                type: 'line'
+                type: 'line',
+                zoomType: 'x'
             },
             xAxis: {
+                ordinal: true,
                 title: {
                     text: 'Date'
                 },
@@ -27,7 +30,7 @@ var ChartsController = {
 
         this.barChart = Highcharts.chart('bar-chart', {
             chart: {
-                type: 'bar'
+                type: 'column'
             },
             title: {
                 text: 'Bar Chart'
@@ -36,21 +39,23 @@ var ChartsController = {
                 title: {
                     text: 'Date'
                 },
-                type: 'datetime'
+                type: 'datetime',
+                minTickInterval: this.monthMilliseconds,
+                minRange: this.monthMilliseconds,
+                ordinal: false
             },
             yAxis: {
                 title: {
-                    text: 'Fruit eaten'
+                    text: 'value'
                 }
             },
-            series: [{
-                name: 'Jane',
-                data: [1, 0, 4]
-            }, {
-                name: 'John',
-                data: [5, 7, 3]
-            }]
+            series: []
         });
+    },
+
+    rescale: function(date, min_value) {
+        this.lineChart.xAxis[0].setExtremes(date, null);
+        this.lineChart.yAxis[0].setExtremes(min_value, null);
     },
 
     loadData: function(series) {
@@ -66,8 +71,17 @@ var ChartsController = {
         xhr.send();
     },
 
-    rescale: function() {
-        console.log('rescale');
+    monthlyReturn: function(series) {
+        var _this = this;
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', _this.apiURL + 'api/series/monthly_return/?series='+series, false);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                var data = JSON.parse(xhr.responseText);
+                _this._prepareMonthlyReturn(series, data);
+            }
+        };
+        xhr.send();
     },
 
     _prepareSeries: function(series, data) {
@@ -77,8 +91,16 @@ var ChartsController = {
                 return [Date.parse(val.date), parseFloat(val.value)];
             })
         });
-    }
+    },
 
+    _prepareMonthlyReturn: function(series, data) {
+        this.barChart.addSeries({
+            name: series,
+            data: data.map(function(val) {
+                return [Date.parse(val.date), parseFloat(val.value)]
+            })
+        })
+    }
 };
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -87,7 +109,10 @@ document.addEventListener('DOMContentLoaded', function() {
     ChartsController.loadData('Aberdeen Global - Emerging Markets Local Currency Bond Fund');
     ChartsController.loadData('Ashmore SICAV - Emerging Markets Local Currency Bond Fund');
 
+    ChartsController.monthlyReturn('Aberdeen Global - Emerging Markets Local Currency Bond Fund');
+    ChartsController.monthlyReturn('Ashmore SICAV - Emerging Markets Local Currency Bond Fund');
+
     document.getElementById('rescale').addEventListener('click', function() {
-       ChartsController.rescale();
+       ChartsController.rescale(Date.UTC(2012, 0, 0), 100);
     });
 });
